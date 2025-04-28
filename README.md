@@ -15,6 +15,6 @@ A web-based team generator that _appears_ to assign players randomly BUT can sec
 
 ## 🤫 Hidden Feature
 
-The hidden feature in theTerms & Conditions ensures that **two specified players** are always placed on the same team, even though the output appears fully random.
+The hidden feature in the Terms & Conditions ensures that **two specified players** are always placed on the same team, even though the output appears fully random.
 
 Enjoy! 🎉
