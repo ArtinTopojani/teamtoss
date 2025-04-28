@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Team Toss</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="icon" type="image/x-icon" href="./images/logo.png" />
+    <style>
+        
+      body {
+          font-family: 'Inter', sans-serif;
+          background-color: #f0f4f8; /* Light gray-blue background */
+          color: #1e293b; /* Dark slate text */
+      }
+      .card {
+          background-color: white;
+          border-radius: 0.75rem; /* Rounded corners */
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Soft shadow */
+          padding: 1.5rem; /* Spacing inside card */
+      }
+      .btn-primary {
+          background-color: #3b82f6; /* Primary blue */
+          color: white;
+          font-weight: 600;
+          padding: 0.7rem 1.4rem; /* Slightly larger padding */
+          border-radius: 0.5rem;
+          transition: background-color 0.3s ease;
+          border: none; /* Ensure no default border */
+      }
+      .btn-primary:hover { background-color: #2563eb; /* Darker blue on hover */ }
+      .btn-secondary {
+           background-color: #e2e8f0; /* Light gray-blue */
+           color: #475569; /* Slate text */
+           font-weight: 500;
+           padding: 0.5rem 1rem;
+           border-radius: 0.5rem;
+           transition: background-color 0.3s ease;
+           border: 1px solid #cbd5e1; /* Light border */
+      }
+      .btn-secondary:hover { background-color: #cbd5e1; /* Slightly darker gray-blue */ }
+      .input-field, .textarea-field {
+          border: 1px solid #cbd5e1; /* Slate border */
+          border-radius: 0.5rem;
+          padding: 0.6rem 0.8rem;
+          width: 100%;
+          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+          font-size: 0.9rem;
+          background-color: #f8fafc; /* Very light background for inputs */
+      }
+      .input-field:focus, .textarea-field:focus {
+           outline: none;
+           border-color: #3b82f6; /* Blue border on focus */
+           box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); /* Blue ring on focus */
+           background-color: white; /* White background on focus */
+      }
+      .textarea-field { min-height: 80px; }
+      .label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4B5563;
+  margin-bottom: 0.25rem;
+}
+      .ad-placeholder {
+          background-color: #ffffff; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; font-size: 0.875rem; min-height: 90px; text-align: center; padding: 1rem;
+      }
+      /* === Team Container Styling === */
+      .team-container {
+          border: 1px solid #e2e8f0; /* Default border */
+          border-radius: 0.5rem;
+          padding: 1rem;
+          margin-bottom: 1rem;
+          min-height: 150px;
+          position: relative;
+          overflow: hidden;
+          transition: background-color 0.3s ease;
+      }
+      /* Light blue background for even teams */
+      .team-bg-light {
+           background-color: #eff6ff; /* Very light blue */
+           border-color: #dbeafe; /* Lighter blue border */
+      }
+      /* Darker blue background for odd teams */
+      .team-bg-dark {
+           background-color: #dbeafe; /* Light blue */
+           border-color: #bfdbfe; /* Slightly darker blue border */
+      }
+      .team-header {
+          display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(100, 116, 139, 0.2); /* Semi-transparent border */ padding-bottom: 0.5rem;
+      }
+      /* Adjust team name input color based on background */
+      .team-bg-light .team-name-input { color: #1e40af; /* Darker blue text on light bg */ }
+      .team-bg-dark .team-name-input { color: #1e3a8a; /* Even darker blue text on dark bg */ }
+      .team-name-input { font-weight: 600; border: none; background: transparent; padding: 0.2rem 0.4rem; border-radius: 0.25rem; width: auto; }
+      .team-name-input:focus { outline: none; background-color: rgba(255, 255, 255, 0.5); box-shadow: 0 0 0 1px #3b82f6; }
+
+      /* Adjust member count color based on background */
+      .team-bg-light .team-header span { color: #475569; /* Slate text on light bg */ }
+      .team-bg-dark .team-header span { color: #334155; /* Darker slate text on dark bg */ }
+
+      .team-members-list { display: flex; flex-wrap: wrap; gap: 0.5rem; position: relative; }
+
+      /* Player Tag Styling */
+      .player-tag {
+          border-radius: 1rem; /* Pill shape */
+          font-size: 0.85rem;
+          font-weight: 500;
+          padding: 0.3rem 0.8rem;
+          position: absolute; /* Start absolute for animation */
+          white-space: nowrap;
+          opacity: 0;
+          transition: all 0.5s ease-in-out;
+          transform: translateY(20px);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Subtle shadow */
+      }
+      /* Adjust player tag colors based on team background */
+      .team-bg-light .player-tag { background-color: #dbeafe; color: #1e40af; } /* Light blue tag on lighter bg */
+      .team-bg-dark .player-tag { background-color: #bfdbfe; color: #1e3a8a; } /* Darker blue tag on light bg */
+
+      .player-tag.visible {
+          opacity: 1;
+          transform: translateY(0);
+          position: relative; /* Become relative after animation */
+      }
+      .player-list-item { display: flex; align-items: center; justify-content: space-between; background-color: #f1f5f9; padding: 0.5rem 0.75rem; border-radius: 0.375rem; margin-bottom: 0.5rem; font-size: 0.9rem; }
+      .player-list-item span { color: #334155; }
+      .remove-player-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem; padding: 0.2rem; }
+      .remove-player-btn:hover { color: #dc2626; }
+      .hidden-section { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
+      .hidden-section.show { max-height: 500px; /* Adjust as needed */ }
+      #playerList {
+           overflow-y: auto;
+           max-height: 70vh;
+           border-radius: 0.375rem;
+           border: 1px solid #e2e8f0;
+           padding: 0.5rem;
+           background-color: #f8fafc;
+      }
+    </style>
+  </head>
+  <body class="p-4 md:p-8">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl md:text-5xl font-bold text-[#3B82F6]">Team Toss</h1>
+      <p class="text-lg text-gray-600 mt-2">
+        Generate teams with advanced customization
+      </p>
+    </header>
+
+    <div class="container mx-auto max-w-7xl">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1 space-y-6">
+          <div class="card">
+            <h2 class="text-xl font-semibold mb-4">1. Add Participants</h2>
+            <div class="mb-4">
+              <label for="playerName" class="label">Add Single Player:</label>
+              <div class="flex gap-2">
+                <input
+                  type="text"
+                  id="playerName"
+                  class="input-field flex-grow"
+                  placeholder="Enter name"
+                />
+                <button id="addPlayerBtn" class="btn-secondary flex-shrink-0">
+                  Add
+                </button>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label for="bulkPlayerNames" class="label"
+                >Add Multiple Players (comma-separated):</label
+              >
+              <textarea
+                id="bulkPlayerNames"
+                class="textarea-field"
+                placeholder="Alice, Bob, Charlie, Tata"
+              ></textarea>
+              <button id="addBulkPlayersBtn" class="btn-secondary w-full mt-2">
+                Add Players from List
+              </button>
+            </div>
+            <h3 class="text-lg font-semibold mt-6 mb-2">
+              Current Participants:
+            </h3>
+            <div id="playerList">
+              <p class="text-gray-500 text-sm italic text-center p-2">
+                No players added yet.
+              </p>
+            </div>
+            <p id="player-count" class="text-sm text-gray-600 mt-2">Total: 0</p>
+          </div>
+
+          <div class="card">
+            <div class="flex justify-between items-center mb-3">
+              <h2 class="text-xl font-semibold">Terms & Conditions</h2>
+              <button
+                id="toggleRiggingBtn"
+                class="text-sm text-blue-600 hover:text-blue-800"
+              >
+                Show <i class="fas fa-chevron-down text-xs ml-1"></i>
+              </button>
+            </div>
+            <div id="riggingSection" class="hidden-section space-y-3">
+              <p class="text-sm text-gray-600">
+                Enter two names to ensure they are on the same team.
+              </p>
+              <div>
+                <label for="riggedName1" class="label">Name 1:</label>
+                <input
+                  type="text"
+                  id="riggedName1"
+                  class="input-field"
+                  placeholder="First rigged name"
+                />
+              </div>
+              <div>
+                <label for="riggedName2" class="label">Name 2:</label>
+                <input
+                  type="text"
+                  id="riggedName2"
+                  class="input-field"
+                  placeholder="Second rigged name"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 space-y-6">
+          <div class="card">
+            <h2 class="text-xl font-semibold mb-4">Generated Teams</h2>
+            <p id="generation-status" class="text-gray-500 mb-4">
+              Add participants and configure settings to generate teams.
+            </p>
+            <div
+              id="teamsOutput"
+              class="grid grid-cols-1 md:grid-cols-2 gap-4"
+            ></div>
+          </div>
+
+          <div class="card">
+            <h2 class="text-xl font-semibold mb-4">2. Configure Teams</h2>
+            <div class="space-y-4">
+              <div>
+                <label class="label">Grouping Method:</label>
+                <div class="flex space-x-4">
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="groupingMethod"
+                      value="numTeams"
+                      checked
+                      class="form-radio text-blue-600 focus:ring-blue-500"
+                    />
+                    <span class="ml-2 text-sm">Number of Teams</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      type="radio"
+                      name="groupingMethod"
+                      value="maxPerTeam"
+                      class="form-radio text-blue-600 focus:ring-blue-500"
+                    />
+                    <span class="ml-2 text-sm">Max Per Team</span>
+                  </label>
+                </div>
+              </div>
+              <div id="numTeamsInputContainer">
+                <label for="numTeams" class="label">Number of Teams:</label>
+                <input
+                  type="number"
+                  id="numTeams"
+                  class="input-field w-full"
+                  value="2"
+                  min="2"
+                />
+              </div>
+              <div id="maxPerTeamInputContainer" style="display: none">
+                <label for="maxPerTeam" class="label"
+                  >Max Players Per Team:</label
+                >
+                <input
+                  type="number"
+                  id="maxPerTeam"
+                  class="input-field w-full"
+                  value="5"
+                  min="1"
+                />
+              </div>
+            </div>
+            <button id="generateButton" class="btn-primary w-full mt-6">
+              Generate Teams
+            </button>
+            <p id="error-message" class="text-red-500 text-sm mt-2 h-4"></p>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8">
+        <p class="text-gray-400 text-sm mb-4">We’re here thanks to:</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <a href="https://www.instagram.com/jeshil_store/" target="_blank">
+            <div class="ad-placeholder">
+              <img src="./images/jeshil_logo.png" alt="ad-jeshil-store" />
+            </div>
+          </a>
+          <div class="ad-placeholder">
+            <img src="./images/gezimi_logo.png" alt="ad-market-gezimi" />
+          </div>
+        </div>
+      </div>
+
+    <script>
+      // --- State ---
+      let players = [];
+      let riggedPair = [];
+      let nextPlayerId = 0;
+
+      // --- DOM Elements ---
+      const playerNameInput = document.getElementById('playerName');
+      const addPlayerBtn = document.getElementById('addPlayerBtn');
+      const bulkPlayerNamesInput = document.getElementById('bulkPlayerNames');
+      const addBulkPlayersBtn = document.getElementById('addBulkPlayersBtn');
+      const playerListDiv = document.getElementById('playerList');
+      const playerCountP = document.getElementById('player-count');
+      const toggleRiggingBtn = document.getElementById('toggleRiggingBtn');
+      const riggingSection = document.getElementById('riggingSection');
+      const riggedName1Input = document.getElementById('riggedName1');
+      const riggedName2Input = document.getElementById('riggedName2');
+      const groupingMethodRadios = document.querySelectorAll(
+        'input[name="groupingMethod"]'
+      );
+      const numTeamsInputContainer = document.getElementById(
+        'numTeamsInputContainer'
+      );
+      const numTeamsInput = document.getElementById('numTeams');
+      const maxPerTeamInputContainer = document.getElementById(
+        'maxPerTeamInputContainer'
+      );
+      const maxPerTeamInput = document.getElementById('maxPerTeam');
+      const generateButton = document.getElementById('generateButton');
+      const teamsOutput = document.getElementById('teamsOutput');
+      const errorMessage = document.getElementById('error-message');
+      const generationStatus = document.getElementById('generation-status');
+
+      // --- Functions ---
+
+      function renderPlayerList() {
+        playerListDiv.innerHTML = '';
+        if (players.length === 0) {
+          playerListDiv.innerHTML =
+            '<p class="text-gray-500 text-sm italic text-center p-2">No players added yet.</p>';
+        } else {
+          players.forEach((player) => {
+            const playerItem = document.createElement('div');
+            playerItem.className = 'player-list-item';
+            playerItem.innerHTML = `
+                        <span class="truncate" title="${player.name}">${player.name}</span>
+                        <button class="remove-player-btn flex-shrink-0" data-id="${player.id}">&times; Remove</button>
+                    `;
+            playerListDiv.appendChild(playerItem);
+          });
+        }
+        playerCountP.textContent = `Total: ${players.length}`;
+      }
+
+      function addSinglePlayer() {
+        const name = playerNameInput.value.trim();
+        if (!name) {
+          showError('Player name cannot be empty.');
+          return;
+        }
+        if (players.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
+          showError(`Player "${name}" already exists.`);
+          return;
+        }
+        players.push({ id: nextPlayerId++, name });
+        renderPlayerList();
+        playerNameInput.value = '';
+        playerNameInput.focus();
+        clearError();
+      }
+
+      function addBulkPlayers() {
+        const namesString = bulkPlayerNamesInput.value.trim();
+        if (!namesString) {
+          showError('Bulk player list cannot be empty.');
+          return;
+        }
+        const namesToAdd = namesString
+          .split(',')
+          .map((name) => name.trim())
+          .filter((name) => name !== '');
+        if (namesToAdd.length === 0) {
+          showError('No valid names found in the list.');
+          return;
+        }
+        let addedCount = 0;
+        let duplicateCount = 0;
+        namesToAdd.forEach((name) => {
+          if (
+            !players.some((p) => p.name.toLowerCase() === name.toLowerCase())
+          ) {
+            players.push({ id: nextPlayerId++, name });
+            addedCount++;
+          } else {
+            duplicateCount++;
+          }
+        });
+        if (addedCount > 0) {
+          renderPlayerList();
+          bulkPlayerNamesInput.value = '';
+          clearError();
+          if (duplicateCount > 0) {
+            // Use non-clearing error for this notification
+            errorMessage.textContent = `Added ${addedCount} players. Skipped ${duplicateCount} duplicate(s).`;
+            setTimeout(() => {
+              if (
+                errorMessage.textContent ===
+                `Added ${addedCount} players. Skipped ${duplicateCount} duplicate(s).`
+              )
+                clearError();
+            }, 5000);
+          }
+        } else if (duplicateCount > 0) {
+          showError(`All ${duplicateCount} names in the list already exist.`);
+        }
+      }
+
+      function removePlayer(id) {
+        players = players.filter((player) => player.id !== id);
+        renderPlayerList();
+      }
+
+      function toggleRigging() {
+        const isHidden = riggingSection.classList.contains('hidden-section');
+        if (isHidden) {
+          riggingSection.classList.remove('hidden-section');
+          riggingSection.classList.add('show');
+          toggleRiggingBtn.innerHTML =
+            'Hide <i class="fas fa-chevron-up text-xs ml-1"></i>';
+        } else {
+          riggingSection.classList.remove('show');
+          riggingSection.classList.add('hidden-section');
+          toggleRiggingBtn.innerHTML =
+            'Show <i class="fas fa-chevron-down text-xs ml-1"></i>';
+        }
+      }
+
+      function updateGroupingInputs() {
+        const selectedMethod = document.querySelector(
+          'input[name="groupingMethod"]:checked'
+        ).value;
+        numTeamsInputContainer.style.display =
+          selectedMethod === 'numTeams' ? 'block' : 'none';
+        maxPerTeamInputContainer.style.display =
+          selectedMethod === 'maxPerTeam' ? 'block' : 'none';
+      }
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+      function showError(message) {
+        errorMessage.textContent = message;
+        // Clear the error message after a few seconds
+        setTimeout(clearError, 5000);
+      }
+      function clearError() {
+        // Only clear if it hasn't been overwritten by a subsequent message
+        if (
+          errorMessage.textContent &&
+          !errorMessage.textContent.startsWith('Added')
+        ) {
+          errorMessage.textContent = '';
+        } else if (errorMessage.textContent.startsWith('Added')) {
+          // Keep the "Added X players..." message slightly longer if needed or handle differently
+        } else {
+          errorMessage.textContent = '';
+        }
+      }
+
+      async function generateTeams() {
+        clearError(); // Clear previous errors first
+        generationStatus.textContent = 'Generating teams...';
+        teamsOutput.innerHTML = '';
+
+        // 1. Get Settings
+        const groupingMethod = document.querySelector(
+          'input[name="groupingMethod"]:checked'
+        ).value;
+        let numTeams = 0;
+        const maxPerTeamVal = parseInt(maxPerTeamInput.value);
+
+        if (groupingMethod === 'numTeams') {
+          numTeams = parseInt(numTeamsInput.value);
+        } else {
+          if (isNaN(maxPerTeamVal) || maxPerTeamVal < 1) {
+            showError(
+              'Please enter a valid maximum number of players per team.'
+            );
+            generationStatus.textContent = 'Generation failed.';
+            return;
+          }
+          numTeams =
+            players.length > 0
+              ? Math.max(1, Math.ceil(players.length / maxPerTeamVal))
+              : 0;
+        }
+
+        // 2. Validation
+        if (players.length === 0) {
+          showError('Please add participants before generating teams.');
+          generationStatus.textContent =
+            'Add participants and configure settings to generate teams.';
+          return;
+        }
+        if (players.length > 1 && numTeams < 2) {
+          if (groupingMethod === 'maxPerTeam') {
+            numTeams = 2; // Force 2 teams if maxPerTeam resulted in 1
+          } else {
+            showError(
+              'Number of teams must be at least 2 (unless only 1 participant exists).'
+            );
+            generationStatus.textContent = 'Generation failed.';
+            return;
+          }
+        }
+        if (players.length === 1) {
+          numTeams = 1; // Only 1 team possible
+        }
+        if (players.length < numTeams) {
+          showError(
+            'Not enough participants for the specified number of teams.'
+          );
+          generationStatus.textContent = 'Generation failed.';
+          return;
+        }
+
+        // 3. Handle Rigging
+        riggedPair = [];
+        const name1 = riggedName1Input.value.trim().toLowerCase();
+        const name2 = riggedName2Input.value.trim().toLowerCase();
+        let actualRiggedPlayers = [];
+        let playersToShuffle = [...players];
+
+        if (name1 && name2 && name1 !== name2) {
+          const player1 = players.find((p) => p.name.toLowerCase() === name1);
+          const player2 = players.find((p) => p.name.toLowerCase() === name2);
+          if (player1 && player2) {
+            riggedPair = [player1.name, player2.name];
+            actualRiggedPlayers = [player1, player2];
+            playersToShuffle = playersToShuffle.filter(
+              (p) => p.id !== player1.id && p.id !== player2.id
+            );
+          } else {
+            // Combine error messages if both are missing
+            let missingMsg = 'Rigged player(s) not found: ';
+            if (!player1) missingMsg += `"${riggedName1Input.value.trim()}"`;
+            if (!player1 && !player2) missingMsg += ', ';
+            if (!player2) missingMsg += `"${riggedName2Input.value.trim()}"`;
+            showError(missingMsg + '.');
+            generationStatus.textContent = 'Generation failed.';
+            return;
+          }
+        } else if (name1 || name2) {
+          // Only one name entered
+          showError('Please enter both names for rigging or leave both empty.');
+          generationStatus.textContent = 'Generation failed.';
+          return;
+        }
+        if (actualRiggedPlayers.length > 0 && numTeams < 1) {
+          // Should be caught earlier
+          showError('Cannot rig players with less than 1 team.');
+          generationStatus.textContent = 'Generation failed.';
+          return;
+        }
+
+        // 4. Shuffle and Distribute
+        shuffleArray(playersToShuffle);
+        const teams = Array.from({ length: numTeams }, () => ({
+          name: '',
+          members: [],
+        }));
+        teams.forEach((team, index) => (team.name = `Team ${index + 1}`));
+
+        if (actualRiggedPlayers.length > 0) {
+          const riggedTeamIndex = Math.floor(Math.random() * numTeams);
+          teams[riggedTeamIndex].members.push(...actualRiggedPlayers);
+        }
+
+        playersToShuffle.forEach((player) => {
+          // Find team with fewest members
+          teams.sort((a, b) => a.members.length - b.members.length);
+          teams[0].members.push(player);
+        });
+
+        // 5. Display Teams and Animate
+        displayTeamsWithAnimation(teams);
+        generationStatus.textContent = 'Teams generated successfully!';
+      }
+
+      async function displayTeamsWithAnimation(teamsData) {
+        teamsOutput.innerHTML = ''; // Clear previous content
+
+        // Create team containers first
+        teamsData.forEach((team, index) => {
+          const teamContainer = document.createElement('div');
+          const bgClass = index % 2 === 0 ? 'team-bg-light' : 'team-bg-dark';
+          teamContainer.className = `team-container ${bgClass}`;
+          teamContainer.innerHTML = `
+                    <div class="team-header">
+                        <input type="text" class="team-name-input" value="${team.name}" data-team-index="${index}" placeholder="Enter Team Name">
+                        <span class="text-sm font-medium">Members: <span class="member-count">0</span></span>
+                    </div>
+                    <div class="team-members-list" id="team-list-${index}"></div>
+                `;
+          teamsOutput.appendChild(teamContainer);
+
+          const nameInput = teamContainer.querySelector('.team-name-input');
+          nameInput.addEventListener('change', (e) => {
+            console.log(`Team ${index + 1} renamed to: ${e.target.value}`);
+          });
+        });
+
+        // Prepare all players for animation
+        const allAssignedPlayers = teamsData.flatMap((team) => team.members);
+        shuffleArray(allAssignedPlayers); // Shuffle animation order
+
+        // Animate players one by one
+        for (let i = 0; i < allAssignedPlayers.length; i++) {
+          const player = allAssignedPlayers[i];
+          const teamIndex = teamsData.findIndex((team) =>
+            team.members.some((member) => member.id === player.id)
+          );
+
+          if (teamIndex !== -1) {
+            const teamListElement = document.getElementById(
+              `team-list-${teamIndex}`
+            );
+            const teamContainer = teamListElement.closest('.team-container');
+            const memberCountSpan =
+              teamContainer.querySelector('.member-count');
+
+            const playerTag = document.createElement('div');
+            playerTag.className = 'player-tag';
+            playerTag.textContent = player.name;
+
+            teamListElement.appendChild(playerTag);
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            playerTag.classList.add('visible');
+            memberCountSpan.textContent =
+              parseInt(memberCountSpan.textContent) + 1;
+
+            await new Promise((resolve) => setTimeout(resolve, 150));
+          }
+        }
+      }
+
+      // --- Event Listeners ---
+      addPlayerBtn.addEventListener('click', addSinglePlayer);
+      playerNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addSinglePlayer();
+      });
+      addBulkPlayersBtn.addEventListener('click', addBulkPlayers);
+      playerListDiv.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-player-btn'))
+          removePlayer(parseInt(e.target.getAttribute('data-id')));
+      });
+      toggleRiggingBtn.addEventListener('click', toggleRigging);
+      groupingMethodRadios.forEach((radio) => {
+        radio.addEventListener('change', updateGroupingInputs);
+      });
+      generateButton.addEventListener('click', generateTeams);
+
+      // --- Initial Setup ---
+      renderPlayerList();
+      updateGroupingInputs();
+    </script>
+  </body>
+</html>
