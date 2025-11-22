@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Team Toss - Advanced Generator</title>
+    <title>Team Toss - Advanced Generator & Practice</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,10 +17,14 @@
     />
     <link rel="icon" type="image/x-icon" href="./images/logo.png" />
     <style>
+      /* =========================================
+         1. CORE WEBSITE STYLES
+         ========================================= */
       body {
         font-family: 'Inter', sans-serif;
         background-color: #f0f4f8;
         color: #1e293b;
+        overflow-x: hidden;
       }
       .card {
         background-color: white;
@@ -70,7 +74,7 @@
       }
       .btn-copy.copied {
         background-color: #047857;
-      } /* Darker green when copied */
+      }
 
       .input-field,
       .textarea-field {
@@ -161,12 +165,6 @@
         background-color: rgba(255, 255, 255, 0.5);
         box-shadow: 0 0 0 1px #3b82f6;
       }
-      .team-bg-light .team-header span {
-        color: #475569;
-      }
-      .team-bg-dark .team-header span {
-        color: #334155;
-      }
 
       .team-members-list {
         display: flex;
@@ -210,9 +208,6 @@
         border-radius: 0.375rem;
         margin-bottom: 0.5rem;
         font-size: 0.9rem;
-      }
-      .player-list-item span {
-        color: #334155;
       }
       .remove-player-btn {
         background: none;
@@ -272,17 +267,12 @@
         display: block;
         word-wrap: break-word;
       }
-      /* Removed champion-copy-field style */
 
       .form-checkbox {
         appearance: none;
         padding: 0;
-        print-color-adjust: exact;
         display: inline-block;
         vertical-align: middle;
-        background-origin: border-box;
-        user-select: none;
-        flex-shrink: 0;
         height: 1rem;
         width: 1rem;
         color: #3b82f6;
@@ -294,43 +284,193 @@
       .form-checkbox:checked {
         border-color: transparent;
         background-color: currentColor;
-        background-size: 100% 100%;
-        background-position: center;
-        background-repeat: no-repeat;
         background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
       }
-      .form-checkbox:focus {
-        outline: 2px solid transparent;
-        outline-offset: 2px;
-        --tw-ring-inset: var(--tw-empty, /*!*/ /*!*/);
-        --tw-ring-offset-width: 2px;
-        --tw-ring-offset-color: #fff;
-        --tw-ring-color: #3b82f6;
-        --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-          var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-          calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-        box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-          var(--tw-shadow, 0 0 #0000);
-      }
 
-      /* Combined Champion List Styles */
       #combinedChampionsSection {
-        display: none; /* Hidden by default */
+        display: none;
         margin-top: 1rem;
       }
-      #combinedChampionList {
-        font-family: monospace;
-        font-size: 0.9rem;
-        line-height: 1.5;
-        padding: 0.75rem;
-        border-radius: 0.5rem;
-        background-color: #f8fafc;
-        color: #1e293b;
-        border: 1px solid #cbd5e1;
+
+      /* =========================================
+         2. GAME & BUTTON STYLES
+         ========================================= */
+
+      /* Fancy Game Entry Button */
+      .game-card-btn {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+        margin-bottom: 1.5rem;
+      }
+      .game-card-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
+      }
+      .game-new-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #facc15;
+        color: #1e3a8a;
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 0.25rem 0.75rem;
+        border-bottom-left-radius: 0.5rem;
+        z-index: 10;
+      }
+
+      /* Game Overlay (Fullscreen) */
+      #game-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #0f172a;
+        z-index: 9999;
+        display: none;
+        overflow: hidden;
+        cursor: crosshair;
+      }
+
+      canvas {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      #player-sprite {
+        position: absolute;
+        width: 200px; /* Large size for visibility */
+        height: 200px;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        pointer-events: none;
+        filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.6));
+      }
+
+      #game-ui {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        min-height: 100px;
-        resize: vertical;
+        height: 100%;
+        pointer-events: none;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 20;
+      }
+      .hud-top {
+        display: flex;
+        justify-content: space-between;
+        color: white;
+        font-family: monospace;
+        text-shadow: 2px 2px 0 #000;
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+      .hud-bottom {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        pointer-events: auto;
+      }
+      .ability-icon {
+        width: 70px;
+        height: 70px;
+        background: #1e293b;
+        border: 3px solid #475569;
+        border-radius: 10px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+      }
+      .ability-icon.ready {
+        border-color: #facc15;
+        box-shadow: 0 0 20px rgba(250, 204, 21, 0.6);
+      }
+      .cooldown-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 0%;
+        background: rgba(0, 0, 0, 0.85);
+        transition: height 0.1s linear;
+      }
+      .cooldown-text {
+        position: absolute;
+        font-size: 1.2rem;
+        z-index: 2;
+        color: #fff;
+      }
+
+      /* Menu & Game Over Screen */
+      #game-menu,
+      #game-over-screen {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        background: rgba(15, 23, 42, 0.95);
+        padding: 3rem;
+        border-radius: 1rem;
+        pointer-events: auto;
+        border: 1px solid #475569;
+        z-index: 30;
+        min-width: 400px;
+      }
+
+      #game-over-screen {
+        display: none; /* Hidden by default */
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .key-badge {
+        background: #334155;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        border: 1px solid #475569;
+        color: #facc15;
+        font-weight: bold;
+        margin-right: 8px;
+      }
+
+      /* Exit button specifically for Game Over top left */
+      #btn-exit-top-left {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color: #ef4444;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: bold;
+        border: 2px solid #b91c1c;
+        cursor: pointer;
+        pointer-events: auto;
+        z-index: 50;
+        display: none; /* Hidden by default */
+      }
+      #btn-exit-top-left:hover {
+        background-color: #dc2626;
       }
     </style>
   </head>
@@ -344,7 +484,9 @@
 
     <div class="container mx-auto max-w-7xl">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- LEFT COLUMN -->
         <div class="lg:col-span-1 space-y-6">
+          <!-- 1. Participants Card -->
           <div class="card">
             <h2 class="text-xl font-semibold mb-4">1. Add Participants</h2>
             <div class="mb-4">
@@ -385,6 +527,33 @@
             <p id="player-count" class="text-sm text-gray-600 mt-2">Total: 0</p>
           </div>
 
+          <!-- ============================================ -->
+          <!-- GAME ENTRY BUTTON -->
+          <!-- ============================================ -->
+          <div id="openGameBtn" class="game-card-btn group">
+            <div class="game-new-badge">NEW</div>
+            <div class="relative z-10 flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-xl mb-1 flex items-center">
+                  <i class="fas fa-gamepad mr-2 text-blue-200"></i> Practice
+                  Kiting
+                </h3>
+                <p class="text-blue-100 text-sm opacity-90">
+                  Warm up your mechanics!
+                </p>
+              </div>
+              <i
+                class="fas fa-chevron-right text-white opacity-70 group-hover:translate-x-1 transition-transform"
+              ></i>
+            </div>
+            <!-- Decorative circle overlay -->
+            <div
+              class="absolute -bottom-6 -right-6 w-24 h-24 bg-white opacity-10 rounded-full"
+            ></div>
+          </div>
+          <!-- ============================================ -->
+
+          <!-- 2. Terms & Conditions Card -->
           <div class="card">
             <div class="flex justify-between items-center mb-3">
               <h2 class="text-xl font-semibold">Terms & Conditions</h2>
@@ -421,6 +590,7 @@
           </div>
         </div>
 
+        <!-- RIGHT COLUMN (Teams & Config) -->
         <div class="lg:col-span-2 space-y-6">
           <div class="card">
             <h2 class="text-xl font-semibold mb-4">Generated Teams</h2>
@@ -528,7 +698,11 @@
             target="_blank"
             class="ad-placeholder hover:shadow-md transition-shadow duration-200"
           >
-            <img src="./images/jeshil_logo.png" alt="Ad Jeshil Store" />
+            <img
+              src="./images/jeshil_logo.png"
+              alt="Ad Jeshil Store"
+              onerror="this.onerror=null; this.src='https://placehold.co/150x50/e2e8f0/64748b?text=Ad+Jeshil+Store';"
+            />
           </a>
           <a
             href="#"
@@ -538,14 +712,109 @@
             <img
               src="./images/gezimi_logo.png"
               alt="Ad Market Gezimi"
-              onerror="this.onerror=null; this.src='https://placehold.co/150x50/e2e8f0/64748b?text=Ad+Placeholder+2';"
+              onerror="this.onerror=null; this.src='https://placehold.co/150x50/e2e8f0/64748b?text=Ad+Market+Gezimi';"
             />
           </a>
         </div>
       </div>
     </div>
 
+    <!-- ========================================== -->
+    <!-- GAME OVERLAY (Initially Hidden)            -->
+    <!-- ========================================== -->
+    <div id="game-overlay">
+      <!-- Exit Button (Shows on Game Over) -->
+      <button id="btn-exit-top-left">
+        <i class="fas fa-arrow-left mr-2"></i> EXIT TO MAIN
+      </button>
+
+      <!-- 1. The Canvas -->
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- 2. The Player Sprite (DOM Element) -->
+      <img id="player-sprite" src="./images/ezreal_top.gif" alt="Player" />
+
+      <!-- 3. UI HUD -->
+      <div id="game-ui">
+        <div class="hud-top">
+          <div>
+            <div class="text-yellow-400">EZREAL KITING</div>
+            <div class="text-sm text-gray-300">
+              Wave: <span id="hud-wave">1</span>
+            </div>
+          </div>
+          <div class="text-right">
+            <div>
+              Score: <span id="hud-score" class="text-green-400">0</span>
+            </div>
+            <div class="text-sm">
+              HP: <span id="hud-hp" class="text-red-400">3</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- START MENU -->
+        <div id="game-menu">
+          <h2 class="text-3xl font-bold mb-6 text-yellow-400">CONTROLS</h2>
+          <ul class="text-left space-y-3 mb-8 text-lg text-gray-200">
+            <li><span class="key-badge">RMB</span> Move (Kiting)</li>
+            <li><span class="key-badge">Mouse</span> Aim</li>
+            <li><span class="key-badge">Q</span> Mystic Shot</li>
+            <li><span class="key-badge">E</span> Arcane Shift</li>
+            <li><span class="key-badge">F</span> Flash</li>
+            <li><span class="key-badge">ESC</span> Exit</li>
+          </ul>
+          <button
+            id="btn-start-game"
+            class="btn-primary text-xl px-10 py-3 w-full"
+          >
+            START
+          </button>
+        </div>
+
+        <!-- GAME OVER SCREEN -->
+        <div id="game-over-screen">
+          <h1 class="text-5xl font-bold text-red-500 mb-2">GAME OVER</h1>
+          <div class="text-2xl text-white mb-4">
+            Score:
+            <span id="final-score" class="text-yellow-400 font-bold">0</span>
+          </div>
+          <div class="text-lg text-gray-400 mb-8">
+            Session High Score:
+            <span id="high-score" class="text-white">0</span>
+          </div>
+          <button
+            id="btn-restart"
+            class="btn-primary text-xl px-10 py-3 w-full"
+          >
+            <i class="fas fa-redo mr-2"></i> RESTART
+          </button>
+        </div>
+
+        <div class="hud-bottom">
+          <div class="ability-icon" id="icon-q">
+            Q
+            <div class="cooldown-overlay" id="cd-q"></div>
+            <span class="cooldown-text" id="cdt-q"></span>
+          </div>
+          <div class="ability-icon" id="icon-e">
+            E
+            <div class="cooldown-overlay" id="cd-e"></div>
+            <span class="cooldown-text" id="cdt-e"></span>
+          </div>
+          <div class="ability-icon" id="icon-f">
+            F
+            <div class="cooldown-overlay" id="cd-f"></div>
+            <span class="cooldown-text" id="cdt-f"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
+      // ===================================
+      // 1. TEAM TOSS LOGIC
+      // ===================================
       let players = [];
       let riggedPair = [];
       let nextPlayerId = 0;
@@ -584,11 +853,11 @@
       const lolStatus = document.getElementById('lol-status');
       const combinedChampionsSection = document.getElementById(
         'combinedChampionsSection'
-      ); // New element ref
+      );
       const combinedChampionListTextarea = document.getElementById(
         'combinedChampionList'
-      ); // New element ref
-      const copyChampionsBtn = document.getElementById('copyChampionsBtn'); // New element ref
+      );
+      const copyChampionsBtn = document.getElementById('copyChampionsBtn');
 
       async function fetchLolData() {
         if (lolDataStatus === 'loaded' || lolDataStatus === 'loading') return;
@@ -617,9 +886,7 @@
           lolDataStatus = 'loaded';
           lolStatus.textContent = `LoL data loaded (v${lolVersion})`;
           generateLolChampionsCheckbox.disabled = false;
-          console.log(`Loaded ${lolChampions.length} champions.`);
         } catch (error) {
-          console.error('Error fetching LoL data:', error);
           lolDataStatus = 'error';
           lolStatus.textContent = 'Error loading LoL data.';
           generateLolChampionsCheckbox.disabled = true;
@@ -755,9 +1022,6 @@
           !errorMessage.textContent.startsWith('Added')
         ) {
           errorMessage.textContent = '';
-        } else if (errorMessage.textContent.startsWith('Added')) {
-        } else {
-          errorMessage.textContent = '';
         }
       }
 
@@ -765,7 +1029,7 @@
         clearError();
         generationStatus.textContent = 'Generating teams...';
         teamsOutput.innerHTML = '';
-        combinedChampionsSection.style.display = 'none'; // Hide combined section initially
+        combinedChampionsSection.style.display = 'none';
 
         const generateLol = generateLolChampionsCheckbox.checked;
 
@@ -880,7 +1144,7 @@
           teams[0].members.push(player);
         });
 
-        let combinedChampionText = ''; // Initialize combined text
+        let combinedChampionText = '';
         if (generateLol) {
           const shuffledChampions = shuffleArray([...lolChampions]);
           let champPoolIndex = 0;
@@ -888,7 +1152,7 @@
             const teamSize = team.members.length;
             if (teamSize > 0) {
               const numChampionsToPick = teamSize * 2 + 1;
-              let teamChampions = []; // Collect champions for this team
+              let teamChampions = [];
               for (let i = 0; i < numChampionsToPick; i++) {
                 if (champPoolIndex >= shuffledChampions.length) {
                   console.warn('Ran out of unique champions.');
@@ -896,28 +1160,26 @@
                 }
                 const pickedChamp = shuffledChampions[champPoolIndex];
                 team.champions.push(pickedChamp);
-                teamChampions.push(pickedChamp.name); // Add name to list
+                teamChampions.push(pickedChamp.name);
                 champPoolIndex++;
               }
-              // Add this team's list to the combined string
               combinedChampionText += `${team.name}: ${teamChampions.join(
                 ', '
               )}\n`;
             }
           });
-          // Update and show the combined textarea if text was generated
           if (combinedChampionText) {
-            combinedChampionListTextarea.value = combinedChampionText.trim(); // Set value and trim trailing newline
-            combinedChampionsSection.style.display = 'block'; // Show the section
+            combinedChampionListTextarea.value = combinedChampionText.trim();
+            combinedChampionsSection.style.display = 'block';
           }
         }
 
-        displayTeamsWithAnimation(teams, generateLol); // Pass teams data to display function
+        displayTeamsWithAnimation(teams, generateLol);
         generationStatus.textContent = 'Teams generated successfully!';
       }
 
       async function displayTeamsWithAnimation(teamsData, includeChampions) {
-        teamsOutput.innerHTML = ''; // Clear previous team boxes
+        teamsOutput.innerHTML = '';
 
         teamsData.forEach((team, index) => {
           const teamContainer = document.createElement('div');
@@ -936,7 +1198,6 @@
               )
               .join('');
 
-            // Removed the individual copy field from here
             championsHTML = `
                         <div class="champions-section">
                             <h4 class="text-sm font-semibold mb-2 ${
@@ -954,7 +1215,7 @@
                         <span class="text-sm font-medium">Members: <span class="member-count">0</span></span>
                     </div>
                     <div class="team-members-list" id="team-list-${index}"></div>
-                    ${championsHTML}`; // Add champion grid HTML (without copy field)
+                    ${championsHTML}`;
           teamsOutput.appendChild(teamContainer);
 
           const nameInput = teamContainer.querySelector('.team-name-input');
@@ -997,7 +1258,6 @@
           navigator.clipboard
             .writeText(textToCopy)
             .then(() => {
-              // Success feedback
               const originalText = copyChampionsBtn.innerHTML;
               copyChampionsBtn.innerHTML =
                 '<i class="fas fa-check mr-2"></i>Copied!';
@@ -1005,14 +1265,13 @@
               setTimeout(() => {
                 copyChampionsBtn.innerHTML = originalText;
                 copyChampionsBtn.classList.remove('copied');
-              }, 2000); // Revert after 2 seconds
+              }, 2000);
             })
             .catch((err) => {
               console.error('Failed to copy text: ', err);
               showError('Failed to copy champions to clipboard.');
             });
         } else if (textToCopy) {
-          // Fallback for older browsers (less reliable)
           try {
             combinedChampionListTextarea.select();
             document.execCommand('copy');
@@ -1050,10 +1309,472 @@
           fetchLolData();
         }
       });
-      copyChampionsBtn.addEventListener('click', copyCombinedChampions); // Add listener for the new button
+      copyChampionsBtn.addEventListener('click', copyCombinedChampions);
 
       renderPlayerList();
       updateGroupingInputs();
+
+      // ============================================
+      // 2. KITING PRACTICE GAME LOGIC (Canvas)
+      // ============================================
+      const CONF = {
+        speed: 400,
+        qSpeed: 1200,
+        qRange: 1000,
+        qCd: 0.5,
+        eCd: 6,
+        eDist: 300,
+        fCd: 15,
+        fDist: 450,
+        minionSpeed: 130,
+        spawnRate: 4,
+        playerHitbox: 50,
+        minionHitbox: 50,
+      };
+
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const playerEl = document.getElementById('player-sprite');
+      const overlay = document.getElementById('game-overlay');
+      const menu = document.getElementById('game-menu');
+      const gameOverScreen = document.getElementById('game-over-screen');
+      const exitBtnTopLeft = document.getElementById('btn-exit-top-left');
+
+      let gameActive = false;
+      let lastTime = 0;
+      let sessionHighScore = 0;
+
+      const imgMap = new Image();
+      imgMap.src = './images/map_floor.jpg';
+
+      const imgMinion = new Image();
+      imgMinion.src = './images/minion_red.png';
+
+      const imgQ = new Image();
+      imgQ.src = './images/ezreal_q.png';
+
+      let gamePlayer = { x: 0, y: 0, tx: 0, ty: 0, moving: false };
+      let projectiles = [];
+      let minions = [];
+      let clickMarker = { x: 0, y: 0, life: 0 };
+
+      let gameState = {
+        hp: 3,
+        score: 0,
+        wave: 1,
+        waveTimer: 0,
+        cds: { q: 0, e: 0, f: 0 },
+      };
+
+      let mapRect = { x: 0, y: 0, w: 0, h: 0 };
+      let mouse = { x: 0, y: 0 };
+
+      // Open Game
+      document.getElementById('openGameBtn').addEventListener('click', () => {
+        overlay.style.display = 'block';
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(console.error);
+        }
+        menu.style.display = 'block';
+        gameOverScreen.style.display = 'none'; // Ensure GO screen is hidden
+        exitBtnTopLeft.style.display = 'none';
+        resizeCanvas();
+        requestAnimationFrame(gameLoop);
+      });
+
+      // Start Game
+      document
+        .getElementById('btn-start-game')
+        .addEventListener('click', () => {
+          menu.style.display = 'none';
+          resetGame();
+          gameActive = true;
+          lastTime = performance.now();
+          requestAnimationFrame(gameLoop);
+        });
+
+      // Restart Game
+      document.getElementById('btn-restart').addEventListener('click', () => {
+        gameOverScreen.style.display = 'none';
+        exitBtnTopLeft.style.display = 'none';
+        resetGame();
+        gameActive = true;
+        lastTime = performance.now();
+        // Loop is likely still running, but if not, restart it
+      });
+
+      // Exit Game Button (Top Left)
+      exitBtnTopLeft.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          gameActive = false;
+          overlay.style.display = 'none';
+        }
+      });
+
+      // Exit on Escape or Fullscreen Change
+      document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+          gameActive = false;
+          overlay.style.display = 'none';
+        }
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.style.display === 'block') {
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+          } else {
+            gameActive = false;
+            overlay.style.display = 'none';
+          }
+        }
+      });
+
+      window.addEventListener('resize', resizeCanvas);
+      document.addEventListener('contextmenu', (e) => {
+        if (overlay.style.display === 'block') e.preventDefault();
+      });
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const aspectRatio =
+          imgMap.width && imgMap.height ? imgMap.width / imgMap.height : 1.77;
+        mapRect.w = window.innerWidth;
+        mapRect.h = mapRect.w / aspectRatio;
+        mapRect.x = 0;
+        mapRect.y = (window.innerHeight - mapRect.h) / 2;
+      }
+
+      function resetGame() {
+        gameState.hp = 3;
+        gameState.score = 0;
+        gameState.wave = 1;
+        gameState.waveTimer = 0;
+        gameState.cds = { q: 0, e: 0, f: 0 };
+
+        gamePlayer.x = window.innerWidth / 2;
+        gamePlayer.y = window.innerHeight / 2;
+        gamePlayer.moving = false;
+
+        projectiles = [];
+        minions = [];
+        updateHUD();
+      }
+
+      function gameLoop(timestamp) {
+        let dt = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+        if (dt > 0.1) dt = 0.1;
+
+        if (gameActive) updateGame(dt);
+        renderGame();
+
+        if (overlay.style.display !== 'none') {
+          requestAnimationFrame(gameLoop);
+        }
+      }
+
+      function updateGame(dt) {
+        if (gameState.cds.q > 0) gameState.cds.q -= dt;
+        if (gameState.cds.e > 0) gameState.cds.e -= dt;
+        if (gameState.cds.f > 0) gameState.cds.f -= dt;
+
+        gameState.waveTimer -= dt;
+        if (gameState.waveTimer <= 0) {
+          spawnWave();
+          gameState.waveTimer = CONF.spawnRate;
+        }
+
+        if (gamePlayer.moving) {
+          const dx = gamePlayer.tx - gamePlayer.x;
+          const dy = gamePlayer.ty - gamePlayer.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const moveStep = CONF.speed * dt;
+
+          if (gamePlayer.tx < gamePlayer.x) {
+            playerEl.style.transform = 'translate(-50%, -50%) scaleX(-1)';
+          } else {
+            playerEl.style.transform = 'translate(-50%, -50%) scaleX(1)';
+          }
+
+          if (dist <= moveStep) {
+            gamePlayer.x = gamePlayer.tx;
+            gamePlayer.y = gamePlayer.ty;
+            gamePlayer.moving = false;
+          } else {
+            gamePlayer.x += (dx / dist) * moveStep;
+            gamePlayer.y += (dy / dist) * moveStep;
+          }
+        }
+
+        for (let i = projectiles.length - 1; i >= 0; i--) {
+          let p = projectiles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+
+          if (
+            p.x < -500 ||
+            p.x > canvas.width + 500 ||
+            p.y < -500 ||
+            p.y > canvas.height + 500
+          ) {
+            projectiles.splice(i, 1);
+            continue;
+          }
+
+          let hit = false;
+          for (let mIndex = minions.length - 1; mIndex >= 0; mIndex--) {
+            let m = minions[mIndex];
+            let dx = p.x - m.x;
+            let dy = p.y - m.y;
+            if (Math.sqrt(dx * dx + dy * dy) < CONF.minionHitbox + 10) {
+              minions.splice(mIndex, 1);
+              gameState.score += 10;
+              hit = true;
+              break;
+            }
+          }
+          if (hit) projectiles.splice(i, 1);
+        }
+
+        for (let i = minions.length - 1; i >= 0; i--) {
+          let m = minions[i];
+          let dx = gamePlayer.x - m.x;
+          let dy = gamePlayer.y - m.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist > 0) {
+            m.x += (dx / dist) * CONF.minionSpeed * dt;
+            m.y += (dy / dist) * CONF.minionSpeed * dt;
+          }
+
+          if (dist < CONF.playerHitbox + CONF.minionHitbox - 30) {
+            damagePlayer();
+            minions.splice(i, 1);
+          }
+        }
+
+        if (clickMarker.life > 0) clickMarker.life -= dt * 3;
+        updateHUD();
+      }
+
+      function renderGame() {
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (imgMap.complete && imgMap.naturalWidth > 0) {
+          ctx.drawImage(imgMap, mapRect.x, mapRect.y, mapRect.w, mapRect.h);
+        } else {
+          ctx.fillStyle = '#1e293b';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.strokeStyle = '#334155';
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(canvas.width, canvas.height);
+          ctx.moveTo(canvas.width, 0);
+          ctx.lineTo(0, canvas.height);
+          ctx.stroke();
+        }
+
+        if (clickMarker.life > 0) {
+          ctx.globalAlpha = clickMarker.life;
+          ctx.strokeStyle = '#00ff00';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(clickMarker.x, clickMarker.y, 15, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = 1.0;
+        }
+
+        minions.forEach((m) => {
+          ctx.fillStyle = 'rgba(0,0,0,0.3)';
+          ctx.beginPath();
+          ctx.ellipse(m.x, m.y + 40, 30, 10, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          const size = 100;
+          let flip = m.x < gamePlayer.x;
+
+          ctx.save();
+          ctx.translate(m.x, m.y);
+          if (flip) ctx.scale(-1, 1);
+
+          if (imgMinion.complete && imgMinion.naturalWidth > 0) {
+            ctx.drawImage(imgMinion, -size / 2, -size / 2, size, size);
+          } else {
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(-size / 2, -size / 2, size, size);
+          }
+          ctx.restore();
+        });
+
+        projectiles.forEach((p) => {
+          const size = 80;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(Math.atan2(p.vy, p.vx) - Math.PI / 2);
+
+          if (imgQ.complete && imgQ.naturalWidth > 0) {
+            ctx.drawImage(imgQ, -size / 2, -size / 2, size, size * 1.5);
+          } else {
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(-10, -30, 20, 60);
+          }
+          ctx.restore();
+        });
+
+        playerEl.style.left = gamePlayer.x + 'px';
+        playerEl.style.top = gamePlayer.y + 'px';
+      }
+
+      function spawnWave() {
+        gameState.wave++;
+        const count = 3 + Math.floor(gameState.wave / 2);
+        for (let i = 0; i < count; i++) {
+          let side = Math.floor(Math.random() * 4);
+          let x, y;
+          const buffer = 100;
+          if (side === 0) {
+            x = Math.random() * canvas.width;
+            y = -buffer;
+          } else if (side === 1) {
+            x = canvas.width + buffer;
+            y = Math.random() * canvas.height;
+          } else if (side === 2) {
+            x = Math.random() * canvas.width;
+            y = canvas.height + buffer;
+          } else {
+            x = -buffer;
+            y = Math.random() * canvas.height;
+          }
+          minions.push({ x, y });
+        }
+      }
+
+      function castQ() {
+        if (gameState.cds.q > 0) return;
+        gameState.cds.q = CONF.qCd;
+
+        let dx = mouse.x - gamePlayer.x;
+        let dy = mouse.y - gamePlayer.y;
+        let len = Math.sqrt(dx * dx + dy * dy);
+
+        let vx = (dx / len) * CONF.qSpeed;
+        let vy = (dy / len) * CONF.qSpeed;
+
+        projectiles.push({
+          x: gamePlayer.x,
+          y: gamePlayer.y,
+          vx: vx,
+          vy: vy,
+        });
+      }
+
+      function castDash(dist) {
+        let dx = mouse.x - gamePlayer.x;
+        let dy = mouse.y - gamePlayer.y;
+        let len = Math.sqrt(dx * dx + dy * dy);
+        let actualDist = Math.min(len, dist);
+
+        gamePlayer.x += (dx / len) * actualDist;
+        gamePlayer.y += (dy / len) * actualDist;
+        gamePlayer.x = Math.max(0, Math.min(canvas.width, gamePlayer.x));
+        gamePlayer.y = Math.max(0, Math.min(canvas.height, gamePlayer.y));
+        gamePlayer.moving = false;
+      }
+
+      function damagePlayer() {
+        gameState.hp--;
+        playerEl.style.filter = 'sepia(1) saturate(5) hue-rotate(-50deg)';
+        setTimeout(
+          () =>
+            (playerEl.style.filter =
+              'drop-shadow(0 15px 15px rgba(0,0,0,0.6))'),
+          200
+        );
+
+        if (gameState.hp <= 0) {
+          // GAME OVER LOGIC
+          gameActive = false; // Pause updates
+          if (gameState.score > sessionHighScore) {
+            sessionHighScore = gameState.score;
+          }
+
+          // Update Text
+          document.getElementById('final-score').innerText = gameState.score;
+          document.getElementById('high-score').innerText = sessionHighScore;
+
+          // Show UI
+          gameOverScreen.style.display = 'flex';
+          exitBtnTopLeft.style.display = 'block';
+        }
+      }
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      window.addEventListener('mousedown', (e) => {
+        if (!gameActive) return;
+
+        if (e.button === 2) {
+          gamePlayer.tx = e.clientX;
+          gamePlayer.ty = e.clientY;
+          gamePlayer.moving = true;
+          clickMarker.x = e.clientX;
+          clickMarker.y = e.clientY;
+          clickMarker.life = 1.0;
+        }
+        if (e.button === 0) {
+          castQ();
+        }
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (!gameActive) return;
+        const k = e.key.toLowerCase();
+
+        if (k === 'q') castQ();
+        if (k === 'e' && gameState.cds.e <= 0) {
+          gameState.cds.e = CONF.eCd;
+          castDash(CONF.eDist);
+        }
+        if (k === 'f' && gameState.cds.f <= 0) {
+          gameState.cds.f = CONF.fCd;
+          castDash(CONF.fDist);
+        }
+      });
+
+      function updateHUD() {
+        document.getElementById('hud-score').innerText = gameState.score;
+        document.getElementById('hud-wave').innerText = gameState.wave;
+        document.getElementById('hud-hp').innerText = gameState.hp;
+        updateCd('q', CONF.qCd);
+        updateCd('e', CONF.eCd);
+        updateCd('f', CONF.fCd);
+      }
+
+      function updateCd(key, max) {
+        const val = gameState.cds[key];
+        const el = document.getElementById('cd-' + key);
+        const txt = document.getElementById('cdt-' + key);
+        const icon = document.getElementById('icon-' + key);
+
+        if (val <= 0) {
+          el.style.height = '0%';
+          txt.innerText = '';
+          icon.classList.add('ready');
+        } else {
+          const pct = (val / max) * 100;
+          el.style.height = pct + '%';
+          txt.innerText = val.toFixed(1);
+          icon.classList.remove('ready');
+        }
+      }
     </script>
   </body>
 </html>
